@@ -1,30 +1,62 @@
 import React from "react";
-
+/**
+ * Creates a caching system to manage data associated with specific keys.
+ * This system is based on a JavaScript Map, providing efficient storage and retrieval operations.
+ */
 const createCache = () => {
   let cache = new Map();
 
   return {
+    /**
+     * Retrieves the value associated with the given key from the cache.
+     * @param {string} key - The key for the cached data.
+     * @returns {*} The cached value or undefined if the key is not found.
+     */
     get(key: string) {
       return cache.get(key);
     },
+    /**
+     * Checks if the cache contains a value for the given key.
+     * @param {string} key - The key to check in the cache.
+     * @returns {boolean} True if the key exists, otherwise false.
+     */
     has(key: string) {
       return cache.has(key);
     },
+    /**
+     * Stores a value in the cache with the specified key.
+     * @param {string} key - The key to associate with the value.
+     * @param {*} value - The value to cache.
+     */
     set(key: string, value: any) {
       cache.set(key, value);
     },
+    /**
+     * Clears all entries from the cache.
+     */
     clear() {
       cache.clear();
     },
+    /**
+     * Serializes the cache into a JSON string for transfer or storage.
+     * @returns {string} The serialized cache data.
+     */
     serialize() {
       return JSON.stringify(Array.from(cache.entries()));
     },
+    /**
+     * Reinitializes the cache with data from a serialized string.
+     * @param {string} serializedCache - A JSON string representing cached entries.
+     */
     initialize(serializedCache: string) {
       cache = new Map(JSON.parse(serializedCache));
     },
   };
 };
 
+/**
+ * A singleton instance of the cache manager, used throughout the application.
+ */
 const cacheManager = createCache();
 
 // You may edit this file, add new files to support this file,
@@ -55,6 +87,11 @@ type UseCachingFetch = (url: string) => {
  * 3. You have not changed any code outside of this file to achieve this.
  * 4. This file passes a type-check.
  *
+ */
+/**
+ * A React hook that fetches data while utilizing caching to optimize performance.
+ * @param {string} url - The API endpoint to fetch data from.
+ * @returns {Object} An object containing loading state, fetched data, and any errors.
  */
 export const useCachingFetch: UseCachingFetch = (url) => {
   const [state, setState] = React.useState({
@@ -115,6 +152,11 @@ export const useCachingFetch: UseCachingFetch = (url) => {
  * 3. This file passes a type-check.
  *
  */
+/**
+ * Preloads data into the cache by fetching it from the specified URL.
+ * @param {string} url - The API endpoint to fetch data from.
+ * @returns {Promise<void>} A promise that resolves when the data is fetched and cached.
+ */
 export const preloadCachingFetch = async (url: string): Promise<void> => {
   if (cacheManager.has(url)) return;
 
@@ -142,14 +184,24 @@ export const preloadCachingFetch = async (url: string): Promise<void> => {
  * 4. This file passes a type-check.
  *
  */
+/**
+ * Serializes the current state of the cache for transfer or storage.
+ * @returns {string} A JSON string representing the cached data.
+ */
 export const serializeCache = () => {
   return cacheManager.serialize();
 };
 
+/**
+ * Initializes the cache with serialized data, typically transferred from the server.
+ * @param {string} serializedCache - The serialized cache string.
+ */
 export const initializeCache = (serializedCache: string) => {
   cacheManager.initialize(serializedCache);
 };
-
+/**
+ * Clears all entries from the cache.
+ */
 export const wipeCache = () => {
   cacheManager.clear();
 };
